@@ -2,7 +2,9 @@
 
 # BRHSegmentedControl
 
-Swift package with a SwiftUI control that mimics the SwiftUI Picker using the segmented style.
+Swift package with a SwiftUI control that mimics the SwiftUI Picker in the segmented style (pre-glass).
+
+ > **Note**: I have no plans to add Apple's Liquid Glass styling myself but I welcome a PR to do so.
 
 ![](demo.gif)
 
