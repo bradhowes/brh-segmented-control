@@ -212,7 +212,7 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
   }
 
   // Mimic Apple's style by hiding the dividers that are adjacent to the active segment
-  private func dividerIsHidden(index: Int) -> Bool { index == selectedViewIndex - 1 || index == selectedViewIndex + 1 }
+  private func dividerIsHidden(index: Int) -> Bool { index == pendingViewIndex - 1 || index == pendingViewIndex + 1 }
   private func dividerColor(index: Int) -> Color { .gray.opacity(dividerIsHidden(index: index) ? 0.0 : 0.3) }
 
   private func dividerView(index: Int) -> some View {
