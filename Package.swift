@@ -1,10 +1,10 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 5.6
 
 import PackageDescription
 
 let package = Package(
   name: "brh-segmented-control",
-  platforms: [.iOS(.v16), .macOS(.v14), .tvOS(.v15), .watchOS(.v8)],
+  platforms: [.iOS(.v15), .macOS(.v12), .tvOS(.v15), .watchOS(.v8)],
   products: [
     .library(
       name: "BRHSegmentedControl",
