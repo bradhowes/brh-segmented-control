@@ -1,5 +1,5 @@
-// Copyright © 2025 Brad Howes. All rights reserved.
-
+// Copyright © 2026 Brad Howes. All rights reserved.
+// swiftlint:disable file_length
 import SwiftUI
 
 /**
@@ -17,7 +17,7 @@ import SwiftUI
  it simply responds to tap events, but the native gesture highlights a segment when the segment is clicked, and
  removes the highlight if the pointer moves outside of the segment. There is no dragging of the segment indicator.
  */
-public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: ShapeStyle>: View {
+public struct BRHSegmentedControl<SegmentView: View, Style: ShapeStyle>: View {
 #if swift(>=6.0)
   @Environment(\.disableAnimations) var disableAnimations
 #else
@@ -39,7 +39,7 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
 
   private let selectedIndex: Binding<Int>
   private let generator: Generator
-  private let segmentForegroundStyler: (BRHSegmentedControlSupport.SegmentState) -> SegmentForegroundStyle
+  private let segmentForegroundStyler: (BRHSegmentedControlSupport.SegmentState) -> Style
 
   private let segmentMinHeight: CGFloat = 32.0
   private let dividerHeight: CGFloat = 18.0
@@ -97,7 +97,7 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
     selectedIndex: Binding<Int>,
     count: Int,
     @ViewBuilder builder: @escaping (Int) -> SegmentView = BRHSegmentedControlSupport.defaultBuilderFromIndex,
-    styler: @escaping (BRHSegmentedControlSupport.SegmentState) -> SegmentForegroundStyle
+    styler: @escaping (BRHSegmentedControlSupport.SegmentState) -> Style
     = BRHSegmentedControlSupport.defaultForegroundStyler
   ) {
     self.selectedIndex = selectedIndex
@@ -119,7 +119,7 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
     labels: [String],
     @ViewBuilder builder: @escaping (Int, String) -> SegmentView
     = BRHSegmentedControlSupport.defaultBuilderFromIndexLabel,
-    styler: @escaping (BRHSegmentedControlSupport.SegmentState) -> SegmentForegroundStyle
+    styler: @escaping (BRHSegmentedControlSupport.SegmentState) -> Style
     = BRHSegmentedControlSupport.defaultForegroundStyler
   ) {
     self.selectedIndex = selectedIndex
@@ -149,6 +149,9 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
     }
     .reactToChange(of: selectedIndex.wrappedValue, calling: selectedIndexChanged)
   }
+}
+
+extension BRHSegmentedControl {
 
   internal func selectedIndexChanged(newValue: Int) {
     if newValue != pendingIndex {
@@ -156,6 +159,16 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
         pendingIndex = newValue
       }
     }
+  }
+
+  internal func segmentedState(for index: Int) -> BRHSegmentedControlSupport.SegmentState {
+    if case .nothing = dragging {
+      if pendingViewIndex == index && pendingIndex != selectedIndex.wrappedValue {
+        return .touched
+      }
+      return selectedViewIndex == index ? .selected : .none
+    }
+    return pendingViewIndex == index ? .selected : .none
   }
 
   private func generateViews(count: Int, builder: VB1) -> some View {
@@ -180,16 +193,6 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
         dividerView(index: index)
       }
     }
-  }
-
-  internal func segmentedState(for index: Int) -> BRHSegmentedControlSupport.SegmentState {
-    if case .nothing = dragging {
-      if pendingViewIndex == index && pendingIndex != selectedIndex.wrappedValue {
-        return .touched
-      }
-      return selectedViewIndex == index ? .selected : .none
-    }
-    return pendingViewIndex == index ? .selected : .none
   }
 
   private func segmentView(index: Int, content: some View) -> some View {
@@ -235,6 +238,9 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
         isSource: false
       )
   }
+}
+
+extension BRHSegmentedControl {
 
 #if os(iOS) || targetEnvironment(macCatalyst)
 
@@ -314,38 +320,14 @@ public struct BRHSegmentedControl<SegmentView: View, SegmentForegroundStyle: Sha
 
 }
 
-extension View {
-
-  @ViewBuilder
-  internal func reactToChange<V: Equatable>(of value: V, calling closure: @escaping (V) -> Void) -> some View {
-    if #available(iOS 17.0, tvOS 17.0, macOS 14.0, watchOS 10.0, *) {
-      self.onChange(of: value) { _, newValue in closure(newValue) }
-    } else {
-      self.onChange(of: value, perform: closure)
-    }
-  }
-}
-
 // Transformations between segment and view indices
-fileprivate extension Int {
+private extension Int {
   var asViewIndex: Int { self * 2 }
   var asSegmentIndex: Int { self / 2 }
   var isSegmentIndex: Bool { self % 2 == 0 }
 }
 
-#if swift(>=6.0)
-
-extension EnvironmentValues {
-  @Entry public var disableAnimations: Bool = false
-}
-
-extension BRHSegmentedControl {
-  public func disableAnimations(_ value: Bool) -> some View {
-    environment(\.disableAnimations, value)
-  }
-}
-
-#endif
+#if DEBUG
 
 internal struct PreviewContent: View {
   let numbers = ["1", "2", "3", "4"]
@@ -384,7 +366,7 @@ internal struct PreviewContent: View {
         .pickerStyle(SegmentedPickerStyle())
       }
 #endif
-      HStack() {
+      HStack {
         Spacer()
         Toggle(isOn: $customTintColor) {
           Text("Use custom tint color")
@@ -424,8 +406,10 @@ internal struct PreviewContent: View {
   }
 }
 
-struct NumericSegmentedControl_Previews: PreviewProvider {
+struct BRHSegmentedControl_Previews: PreviewProvider {
   static var previews: some View {
     PreviewContent()
   }
 }
+
+#endif

@@ -1,17 +1,17 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 6.1
 
 import PackageDescription
 
 let package = Package(
   name: "brh-segmented-control",
-  platforms: [.iOS(.v15), .macOS(.v12), .tvOS(.v15), .watchOS(.v8)],
+  platforms: [.iOS(.v16), .macOS(.v14), .tvOS(.v15), .watchOS(.v8)],
   products: [
     .library(
       name: "BRHSegmentedControl",
-      targets: ["BRHSegmentedControl"]),
+      targets: ["BRHSegmentedControl"])
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.17.0")
+    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.18.0")
   ],
   targets: [
     .target(
@@ -22,6 +22,6 @@ let package = Package(
         "BRHSegmentedControl",
         .product(name: "SnapshotTesting", package: "swift-snapshot-testing")
       ]
-    ),
+    )
   ]
 )

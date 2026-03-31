@@ -2,15 +2,13 @@ import SnapshotTesting
 import SwiftUI
 import XCTest
 
-// TODO: eliminate most/all of this with latest swift-snapshot-testing package. Probably no longer needed.
-
-public struct __SnapshotTestViewWrapper<Content: View>: View {
+private struct SnapshotTestViewWrapper<Content: View>: View {
   let size: CGSize
   let content: Content
   let colorScheme: ColorScheme
   let background: Color
 
-  public init(size: CGSize, colorScheme: ColorScheme, background: Color?,  @ViewBuilder _ content: () -> Content) {
+  public init(size: CGSize, colorScheme: ColorScheme, background: Color?, @ViewBuilder _ content: () -> Content) {
     self.size = size
     self.content = content()
     self.colorScheme = colorScheme
@@ -34,7 +32,7 @@ func makeUniqueSnapshotName(_ funcName: String) -> String {
   return funcName + "-" + platform
 }
 
-@MainActor @inlinable
+@MainActor
 func assertSnapshot<V: SwiftUI.View>(
     matching: V,
     size: CGSize = CGSize(width: 400, height: 220),
@@ -49,7 +47,7 @@ func assertSnapshot<V: SwiftUI.View>(
 
 #if os(iOS)
 
-  let view = __SnapshotTestViewWrapper(size: size, colorScheme: colorScheme, background: background) {
+  let view = SnapshotTestViewWrapper(size: size, colorScheme: colorScheme, background: background) {
     matching
   }
 
